@@ -1,0 +1,6 @@
+hello_world = interface +c {
+    static create():hello_world;
+    get_hello_world(): string;
+    get_name(): string;
+    set_name(name:string);
+}
