@@ -213,3 +213,60 @@ src/cpp/hello\_world\_impl.cpp:
 	Hello World! 02:28:10 PM
 	
 c++代码调试通过
+
+# 4 iOS工程
+## 4.1 创建ios工程
+
+在[example\_root]/ 下创建ios\_project目录
+
+Xcode创建ios工程，命名为HelloWorld
+
+## 4.2 添加文件
+将以下目录中文件加入Xcode（只引用不copy），并虚拟目录分组为oc，c++，djinni
+
+	[example_root]/generated-src/objc/
+	[example_root]/generated-src/cpp/
+	[example_root]/scr/cpp/
+	[example_root]/deps/djinni/support-lib/objc/
+	
+此时目录结构为：
+
+![Alt text](image/11.png)
+
+其中
+
+oc文件夹中为djinni生成的接口文件
+c++文件夹中为djinni生成的接口文件和我们自己写的c++实现文件
+djinni文件夹中为转换文件（拖入工程就可以了）
+
+# 4.3 调试
+
+此时我们调用c++写的实现代码，只需要调用我们oc文件夹中的接口文件啦
+
+首先引入头文件
+
+	#import "HWHelloWorld.h"
+
+接着调用代码
+
+	NSString *str = [[HWHelloWorld create] getHelloWorld];
+	NSLog(@"str:%@",str);
+	
+输出
+
+	Hello World! 02:28:10 PM
+	
+perfect ！！！
+
+# 问答
+Q：oc可以和c++混编为objective-c++，那么我们直接oc和c++互相调用不就行了吗，为什么还要用djinni呢？
+
+A：oc可以和c++混编，但是java是需要通过jni。所以使用djinni就是为了统一接口，让同一份c++代码可以被oc和java调用，让c++工程师、objective-c工程师、java工程师能够愉快的一起合作项目。ps：如果只是单纯的想在oc里边混编c++，可以完全不用djinni
+
+
+Q：上边的例子中，是c++写实现代码，java和oc调用，那么有没有oc和java写实现代码，c++调用呢？
+
+A：提出这个问题，说明你对c++跨平台有一定的了解了。当然啦，有调用，就有被调用。如果仔细看的上边的例子的话，会发现我们在helloworld.djinni文件中定义接口的时候，我们是这样写的hello_world = interface +c {}，那么这个+c是什么意思的，+c就是c++来实现代码，供其他平台调用。反过来我们可以写 +j +o，意思就是java和oc写实现代码，c++来调用。这样就实现了c++，java，oc之间的互相调用
+
+
+	
