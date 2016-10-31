@@ -95,5 +95,121 @@ Djinni 是一个用来生成跨语言的类型声明和接口绑定的工具，�
 
 ![Alt text](image/5.png)
 	
-这里可以看到：依据描述文件helloworld.djinni，C++ 和 Java 及 Objective-C 的绑定代码都会自动生成好。继续要做的，只是写它们的具体实现
+这里可以看到：依据描述文件helloworld.djinni，在generated-src目录下自动生产了 C++ 和 Java 及 Objective-C 的绑定代码。继续要做的，只是写它们的具体实现
 
+# 3 编写c++代码
+## 3.1 创建c++工程
+这里用 XCode 创建一个 C++ 工程，来测试 C++ 接口代码。
+
+首先，打开 XCode ，选择”Create a new Xcode project”。然后，选择”Command Line Tool”，来新建命令行工具。
+
+![Alt text](image/6.png)
+
+“Next”到下一步时，”Language”选择”C++”。
+
+![Alt text](image/7.png)
+
+“Next”到下一步，放在[example_root]/ 下
+
+此时目录结构为：
+
+![Alt text](image/8.png)
+
+## 3.2 编写c++实现代码
+
+首先在[example_root]/ 下创建src/cpp目录，用来存放c++实现代码
+
+src/cpp/hello\_world\_impl.hpp:
+
+	#pragma once
+ 
+	#include "hello_world.hpp"
+ 
+	namespace helloworld {
+    
+    	class HelloWorldImpl : public helloworld::HelloWorld {
+        
+    	public:
+        
+        	// Constructor
+        	HelloWorldImpl();
+        
+        	// Our method that returns a string
+        	std::string get_hello_world();
+        
+    	};
+    
+	}
+
+src/cpp/hello\_world\_impl.cpp:
+
+	#include "hello_world_impl.hpp"
+	#include <string>
+ 
+	namespace helloworld {
+    
+    	std::shared_ptr<HelloWorld> HelloWorld::create() {
+    	    return std::make_shared<HelloWorldImpl>();
+    	}
+    	
+    	HelloWorldImpl::HelloWorldImpl() {
+ 	
+    	}
+    
+    	std::string HelloWorldImpl::get_hello_world() {
+        
+     	   std::string myString = "Hello World! ";
+        
+       	 time_t t = time(0);
+       	 tm now=*localtime(&t);
+        	char tmdescr[200]={0};
+        	const char fmt[]="%r";
+        	if (strftime(tmdescr, sizeof(tmdescr)-1, fmt, &now)>0) {
+        	    myString += tmdescr;
+        	}
+        
+        	return myString;
+        
+    	}
+    
+	}
+	
+
+此时目录结构为：
+
+![Alt text](image/9.png)
+
+## 3.3 调试c++代码
+
+接下来，把以下 C++ 接口代码文件，拖动到 Xcode 工程目录来引入(只需引用文件，避免复制。)
+
+	generated-src/cpp/hello_world.hpp
+	src/cpp/hello_world_impl.cpp
+	src/cpp/hello_world_impl.hpp
+
+此时目录结构为：
+
+![Alt text](image/10.png)
+
+编写以下代码：
+
+	#include <iostream>
+	using namespace std;
+
+	#include "hello_world_impl.hpp"
+
+	int main(int argc, const char * argv[]) {
+
+    	helloworld::HelloWorldImpl hw = helloworld::HelloWorldImpl();
+    
+    	string myString = hw.get_hello_world();
+    	cout << myString << endl;
+    
+    	return 0;
+	}
+	
+输出为:
+
+	Hello World! 02:28:10 PM
+	
+c++代码调试通过
